@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
-import "@openzeppelin/contracts/utils/Strings.sol";
+
 
 contract Vault {
     mapping(address => uint) public balances;
@@ -12,7 +12,8 @@ contract Vault {
     
     /// @dev Redeem your ETH.
     function redeem() public {
-        (bool sent, bytes memory data) = msg.sender.call{ value: balances[msg.sender] }("");
+        (bool sent, bytes memory data) =
+            msg.sender.call{ value: balances[msg.sender] }("");
         require(sent, "redeem fails on transfert");
         balances[msg.sender] = 0;
     }
@@ -32,8 +33,9 @@ contract SafeVault {
         require(balances[msg.sender] > 0, "no money");
         uint amount = balances[msg.sender];
         balances[msg.sender] = 0;
-        (bool sent, bytes memory data) = msg.sender.call{ value: amount }("");
-        require(sent, string.concat("redeem fails on transfert: ", Strings.toString(amount)));
+        (bool sent, bytes memory data) =
+            msg.sender.call{ value: amount }("");
+        require(sent, "redeem fails on transfert");
     }
 }
 
@@ -51,7 +53,7 @@ contract VaultAttack {
         if (address(_target).balance > 0 ether) 
             _target.redeem();
         else
-            _owner.call{ value:  address(this).balance}("");
+            _owner.call{value: address(this).balance}("");
     }
 
     function attack() payable external {
