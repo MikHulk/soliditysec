@@ -12,7 +12,7 @@ contract Vault {
     
     /// @dev Redeem your ETH.
     function redeem() public {
-        (bool sent, bytes memory data) =
+        (bool sent, ) =
             msg.sender.call{ value: balances[msg.sender] }("");
         require(sent, "redeem fails on transfert");
         balances[msg.sender] = 0;
@@ -33,7 +33,7 @@ contract SafeVault {
         require(balances[msg.sender] > 0, "no money");
         uint amount = balances[msg.sender];
         balances[msg.sender] = 0;
-        (bool sent, bytes memory data) =
+        (bool sent, ) =
             msg.sender.call{ value: amount }("");
         require(sent, "redeem fails on transfert");
     }
@@ -53,8 +53,11 @@ contract VaultAttack {
     function drain() private {
         if (address(_target).balance >= _step) 
             _target.redeem();
-        else
-            _owner.call{value: address(this).balance}("");
+        else {
+            (bool sent, ) = 
+                _owner.call{value: address(this).balance}("");
+            require(sent);
+        }
     }
 
     function attack() payable external {
