@@ -118,6 +118,7 @@ contract Voting is Ownable {
     }
 
     function votesTallied()
+            virtual
             public
             flowStatus(WorkflowStatus.VotingSessionEnded)
             onlyOwner { 
@@ -176,6 +177,16 @@ contract SafeVoting is Voting {
         }
 
         emit Voted(msg.sender, proposalId);
+    }
+
+    function votesTallied()
+            override public
+            flowStatus(WorkflowStatus.VotingSessionEnded)
+            onlyOwner {
+        workflowStatus = WorkflowStatus.VotesTallied;
+        emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded,
+                                  WorkflowStatus.VotesTallied);
+        
     }
 
 }
